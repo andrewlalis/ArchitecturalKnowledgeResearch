@@ -45,7 +45,7 @@ void use(ProgramArgs args) {
 	auto filename = args.arg("file");
 	writefln("Using data from %s", filename);
 	string fileContent = std.file.readText(filename);
-	auto data = deserialize!MailingListQueryResult(fileContent);
+	auto data = deserialize!MailingListDataSet(fileContent);
 	writefln("Read data and found %d threads.", data.threads.length);
 
 	// TODO: Add ways to interact with the via command line.

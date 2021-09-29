@@ -27,7 +27,7 @@ const string EMAILS_URL = BASE_URL ~ "/email-thread/%d/email?sort=date";
  *   query = The search query information.
  * Returns: A result of searching, containing zero or more email threads.
  */
-MailingListQueryResult searchMailingLists(MailingListQuery query) {
+MailingListDataSet searchMailingLists(MailingListQuery query) {
     auto const url = format(
         SEARCH_URL,
         query.queryString.encode,
@@ -45,7 +45,7 @@ MailingListQueryResult searchMailingLists(MailingListQuery query) {
     }
     pool.finish(true);
     threads.sort!((a, b) => a.searchIndex < b.searchIndex);
-    return MailingListQueryResult(query, threads);
+    return MailingListDataSet(query, threads);
 }
 
 void parseAndAppendEmailThread(RefAppender!(EmailThread[]) app, Asdf json, int index) {

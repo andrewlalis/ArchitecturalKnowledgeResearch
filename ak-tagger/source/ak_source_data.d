@@ -38,7 +38,7 @@ struct MailingListQuery {
     uint size;
 }
 
-struct MailingListQueryResult {
+struct MailingListDataSet {
     MailingListQuery query;
     EmailThread[] threads;
 }
