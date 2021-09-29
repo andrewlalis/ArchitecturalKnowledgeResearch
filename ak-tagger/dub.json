@@ -1,0 +1,13 @@
+{
+	"authors": [
+		"Andrew Lalis"
+	],
+	"copyright": "Copyright © 2021, Andrew Lalis",
+	"dependencies": {
+		"asdf": "~>0.7.12",
+		"commandr": "~>0.2.0"
+	},
+	"description": "Utility for categorizing sources of architectural knowledge.",
+	"license": "MIT",
+	"name": "ak-tagger"
+}

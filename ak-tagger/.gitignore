@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/ak-tagger
+ak-tagger.so
+ak-tagger.dylib
+ak-tagger.dll
+ak-tagger.a
+ak-tagger.lib
+ak-tagger-test-*
+*.exe
+*.o
+*.obj
+*.lst
