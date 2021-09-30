@@ -1,8 +1,10 @@
 import std.stdio;
 import std.file;
+import std.string;
 
 import fetching;
 import ak_source_data;
+import use_data;
 
 import asdf;
 import commandr;
@@ -37,16 +39,11 @@ void fetch(ProgramArgs args) {
 	auto result = searchMailingLists(query);
 	writefln("Found %d email threads matching this query.", result.threads.length);
 	writeln("Enter the name of the JSON file to save results to.");
-	auto filename = readln();
+	auto filename = strip(readln());
 	std.file.write(filename, serializeToJsonPretty(result));
 }
 
 void use(ProgramArgs args) {
 	auto filename = args.arg("file");
-	writefln("Using data from %s", filename);
-	string fileContent = std.file.readText(filename);
-	auto data = deserialize!MailingListDataSet(fileContent);
-	writefln("Read data and found %d threads.", data.threads.length);
-
-	// TODO: Add ways to interact with the via command line.
+	useData(filename);
 }
