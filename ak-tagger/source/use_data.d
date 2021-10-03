@@ -9,8 +9,10 @@ import std.regex;
 import std.range;
 import std.conv;
 import std.datetime;
+import std.array;
 
 import asdf;
+import commandr;
 
 import ak_source_data;
 
@@ -19,95 +21,104 @@ void useData(string filename) {
 	string fileContent = std.file.readText(filename);
 	auto data = deserialize!MailingListDataSet(fileContent);
 	writefln("Read data and found %d threads.", data.threads.length);
-    navigateThreads(data);
+    
+    auto prog = new Program("use")
+		.add(new Command("help"))
+        .add(new Command("exit"))
+        .add(new Command("tags")
+            .add(new Argument("thread", "The thread to get the tags for.")))
+		.add(new Command("tag")
+            .add(new Argument("thread", "The thread number to tag."))
+            .add(new Argument("value", "The tag to add to the thread.")))
+        .add(new Command("untag")
+            .add(new Argument("thread", "The thread number to tag."))
+            .add(new Argument("value", "The tag to remove from the thread.")))
+        .add(new Command("export")
+            .add(new Argument("thread", "The thread number to export.")))
+        .add(new Command("clean"))
+		.defaultCommand("help");
+
+    bool shouldExit = false;
+
+    while (!shouldExit) {
+        string[] args = ["use"] ~ (readln().strip.split!isWhite).array;
+        auto pArgs = prog.parse(args);
+        pArgs
+            .on("help", (ProgramArgs args) {
+                prog.printHelp();
+            })
+            .on("tags", (args) => listTags(args, data))
+            .on("tag", (args) => tag(args, data))
+            .on("untag", (args) => untag(args, data))
+            .on("export", (args) => exportThread(args, data))
+            .on("clean", (args) => cleanExports())
+            .on("exit", (ProgramArgs args) {
+                shouldExit = true;
+            });
+    }
+
+    std.file.write(filename, serializeToJsonPretty(data));
+    writefln("Saved data to %s.", filename);
 }
 
-void navigateThreads(MailingListDataSet data) {
-    uint page = 0;
-    uint size = 5;
-    bool shouldExit = false;
-    while (!shouldExit) {
-        auto lowerBound = page * size;
-        auto upperBound = min(data.threads.length, (page * size + size));
-        auto threadsToDisplay = data.threads[lowerBound .. upperBound];
-        writefln(
-            "Displaying page %d of %d pages of email threads.\n-----",
-            page + 1,
-            (data.threads.length / size) + 1
-        );
-        foreach (thread; threadsToDisplay) {
-            writefln(
-                "Thread %d of %d: %d emails\n\tSubject: %s\n\tTags: %s",
-                thread.searchIndex + 1,
-                data.threads.length,
-                thread.emails.length,
-                thread.subject,
-                thread.tags
-            );
-        }
-        writeln("Enter \"n\" for next page, \"p\" for previous page, \"e\" to exit, or the number of a thread to view it.");
-        string cmd = toLower(strip(readln()));
-        if (cmd == "n" && (page * size + size) < data.threads.length) {
-            page++;
-        } else if (cmd == "p" && (page > 0)) {
-            page--;
-        } else if (startsWith(cmd, "export")) {
-            auto captures = matchFirst(cmd, "\\d+");
-            if (!captures.empty) {
-                uint index = to!uint(captures.front);
-                if (index >= 0 && index < data.threads.length) {
-                    exportThread(data.threads[index]);
-                }
-            }
-        } else if (cmd == "e" || cmd == "exit" || cmd == "quit") {
-            shouldExit = true;
+// Lists all tags for a given thread.
+void listTags(ProgramArgs args, MailingListDataSet data) {
+    uint threadIndex = to!uint(args.arg("thread"));
+    if (threadIndex < 1 || threadIndex > data.threads.length) {
+        writeln("Invalid thread.");
+    } else {
+        auto tags = data.threads[threadIndex - 1].tags;
+        tags.sort();
+        writefln("Thread %d is tagged with: %s", threadIndex, tags);
+    }
+}
+
+// Adds a tag to a thread.
+void tag(ProgramArgs args, ref MailingListDataSet data) {
+    uint threadIndex = to!uint(args.arg("thread"));
+    string tag = args.arg("value");
+    if (threadIndex < 1 || threadIndex > data.threads.length) {
+        writeln("Invalid thread.");
+    } else {
+        auto tags = data.threads[threadIndex - 1].tags;
+        if (!tags.canFind(tag)) {
+            tags ~= tag;
+            data.threads[threadIndex - 1].tags = tags;
+            writefln("Tagged thread %d with %s.", threadIndex, tag);
         } else {
-            auto captures = matchFirst(cmd, "(?:tag) \\d+ \\w+");
-            // TODO: Implement adding and removing tags from threads.
-            if (!captures.empty) {
-                string[] words = captures.front.split;
-                writeln(words);
-            }
+            writefln("Thread %d already has the tag %s.", threadIndex, tag);
         }
     }
 }
 
-void navigateThread(EmailThread thread) {
-    uint currentEmailIndex = 0;
-    bool shouldExit = false;
-    while (!shouldExit) {
-        writefln(
-            "Viewing email %d of %d in thread %d.\n\tThread tags:%s\n-----",
-            currentEmailIndex + 1,
-            thread.emails.length,
-            thread.searchIndex,
-            thread.tags
-        );
-        auto email = thread.emails[currentEmailIndex];
-        writefln(
-            "MessageId: %s\nDate: %s\nIn Reply To: %s\nSent From: %s\nSubject: %s",
-            email.messageId,
-            SysTime.fromUnixTime(email.date).toISOExtString,
-            email.inReplyTo,
-            email.sentFrom,
-            email.subject
-        );
-        writefln("\n%s\n", email.body);
-        string cmd = toLower(strip(readln()));
-        if (cmd == "n" && currentEmailIndex + 1 < thread.emails.length) {
-            currentEmailIndex++;
-        } else if (cmd == "p" && currentEmailIndex > 0) {
-            currentEmailIndex--;
-        } else if (cmd == "export") {
-
-        } else if (cmd == "e" || cmd == "exit" || cmd == "quit") {
-            shouldExit = true;
+// Removes a tag from a thread.
+void untag(ProgramArgs args, ref MailingListDataSet data) {
+    uint threadIndex = to!uint(args.arg("thread"));
+    string tag = args.arg("value");
+    if (threadIndex < 1 || threadIndex > data.threads.length) {
+        writeln("Invalid thread.");
+    } else {
+        auto tags = data.threads[threadIndex - 1].tags;
+        if (tags.canFind(tag)) {
+            tags = tags.remove!(a => a == tag);
+            data.threads[threadIndex - 1].tags = tags;
+            writefln("Removed tag %s from thread %d.", tag, threadIndex);
+        } else {
+            writefln("Thread %d isn't tagged with %s.", threadIndex, tag);
         }
     }
 }
 
-void exportThread(EmailThread thread) {
-    auto file = File(format("thread-%d.txt", thread.searchIndex), "w");
+// Exports a thread and all its contents to a text file for easy viewing.
+void exportThread(ProgramArgs args, MailingListDataSet data) {
+    uint threadIndex = to!uint(args.arg("thread"));
+    if (threadIndex < 1 || threadIndex > data.threads.length) {
+        writeln("Invalid thread.");
+        return;
+    }
+    auto thread = data.threads[threadIndex - 1];
+    string filename = format("thread-%d.txt", threadIndex);
+    auto file = File(filename, "w");
     file.writefln(
         "Thread %d\nId: %d\nDate: %s\nSubject: %s\n\nTags: %s\n\n\n",
         thread.searchIndex,
@@ -132,4 +143,16 @@ void exportThread(EmailThread thread) {
         file.writefln("\n%s\n", email.body);
     }
     file.close();
+    writefln("Exported thread %d to %s.", threadIndex, filename);
+}
+
+// Removes all exported threads.
+void cleanExports() {
+    auto r = regex("thread-\\d+\\.txt");
+    foreach (string filename; dirEntries("", SpanMode.shallow)) {
+        if (!matchAll(filename, r).empty) {
+            remove(filename);
+            writefln("Removed %s", filename);
+        }
+    }
 }

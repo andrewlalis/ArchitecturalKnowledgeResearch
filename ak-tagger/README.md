@@ -14,5 +14,13 @@ To fetch data from ArchDetector for use with this tool, you can use the `fetch` 
 ## Interacting with Data
 To view and interact with the data from a particular data set, use the `use <file>` subcommand. This will provide a simple interactive prompt for navigating the data set, viewing individual or sequential data sources, and adding/removing tags from certain sources.
 
-## Exporting and Importing
-By default, all data is stored in JSON format, and can be exported or imported by simply copying files.
+More specifically, the following commands are available from within the `use` interactive interface:
+
+- `tags <thread>` List all tags for the given thread.
+- `tag <thread> <tag>` Add a tag to a thread.
+- `untag <thread> <tag>` Remove a tag from a thread.
+- `export <thread>` Export a thread to a text file for easy viewing.
+- `clean` Removes all exported text files.
+- `exit` Exit the interactive interface, and save all changes.
+
+> Where a `<thread>` argument is required, provide the "search index" of the thread; that is, if the data set contains 5 threads, the first one has a search index of 1, the second has 2, then 3, and so on.
