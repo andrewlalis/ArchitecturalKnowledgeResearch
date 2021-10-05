@@ -1,10 +1,12 @@
 import std.stdio;
 import std.file;
 import std.string;
+import std.conv;
 
 import fetching;
 import ak_source_data;
 import use_data;
+import inspect_data;
 
 import asdf;
 import commandr;
@@ -12,7 +14,11 @@ import commandr;
 void main(string[] args) {
 	parseArgs(args)
 		.on("fetch", (args) => fetch(args))
-		.on("use", (args) => use(args));
+		.on("use", (args) => use(args))
+		.on("inspect", (ProgramArgs args) {
+			string filename = to!string(args.arg("file"));
+			inspect(filename);
+		});
 }
 
 void fetch(ProgramArgs args) {
@@ -38,6 +44,8 @@ private ProgramArgs parseArgs(string[] args) {
 		.add(new Command("fetch"))
 		.add(new Command("use")
 			.add(new Argument("file", "The file to use.")))
+		.add(new Command("inspect")
+			.add(new Argument("file", "The file to inspect.")))
 		.defaultCommand("help");
 
 	auto pArgs = prog.parse(args);

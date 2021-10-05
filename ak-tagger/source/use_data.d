@@ -25,6 +25,7 @@ void useData(string filename) {
     auto prog = new Program("use")
 		.add(new Command("help"))
         .add(new Command("exit"))
+        .add(new Command("save"))
         .add(new Command("tags")
             .add(new Argument("thread", "The thread to get the tags for.")))
 		.add(new Command("tag")
@@ -54,11 +55,13 @@ void useData(string filename) {
             .on("clean", (args) => cleanExports())
             .on("exit", (ProgramArgs args) {
                 shouldExit = true;
+            })
+            .on("save", (ProgramArgs args) {
+                save(filename, data);
             });
     }
 
-    std.file.write(filename, serializeToJsonPretty(data));
-    writefln("Saved data to %s.", filename);
+    save(filename, data);
 }
 
 // Lists all tags for a given thread.
@@ -155,4 +158,9 @@ void cleanExports() {
             writefln("Removed %s", filename);
         }
     }
+}
+
+void save(string filename, MailingListDataSet data) {
+    std.file.write(filename, serializeToJsonPretty(data));
+    writefln("Saved data to %s.", filename);
 }
