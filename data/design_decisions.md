@@ -49,7 +49,7 @@ Decisions which state that some elements will not appear in the system's design 
 
 Examples:
 
-> I'd like to propose that we retroactively classify materialized views as an experimental feature, disable them by default, and require users to enable them through a config setting before using.
+> 
 
 ## Technology
 

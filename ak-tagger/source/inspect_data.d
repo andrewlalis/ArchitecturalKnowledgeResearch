@@ -8,6 +8,11 @@ import asdf;
 
 import ak_source_data;
 
+/** 
+ * Inspects data from a JSON-structured mailing list data set.
+ * Params:
+ *   filename = The name of the file to inspect.
+ */
 void inspect(string filename) {
     writefln("Inspecting %s.", filename);
     string fileContent = std.file.readText(filename);
@@ -16,7 +21,7 @@ void inspect(string filename) {
     int[string] allTags;
     foreach (thread; data.threads) {
         thread.tags.sort();
-        writefln("Thread %d: Tags: %s", thread.searchIndex, thread.tags);
+        writefln("Thread %d: Tags: %s", thread.searchIndex + 1, thread.tags);
         foreach (tag; thread.tags) {
             if (tag !in allTags) {
                 allTags[tag] = 1;
