@@ -24,6 +24,7 @@ void main(string[] args) {
 void fetch(ProgramArgs args) {
 	writeln("Enter the Lucene search query to use:");
 	auto queryStr1 = readln();
+	// TODO: Implement input for mailing list ids, page, and size.
 	auto query = MailingListQuery(queryStr1, [10, 11, 12, 13], 0, 50);
 	auto result = searchMailingLists(query);
 	writefln("Found %d email threads matching this query.", result.threads.length);

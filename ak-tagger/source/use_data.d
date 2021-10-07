@@ -36,6 +36,8 @@ void useData(string filename) {
             .add(new Argument("value", "The tag to remove from the thread.")))
         .add(new Command("export")
             .add(new Argument("thread", "The thread number to export.")))
+        .add(new Command("export-untagged"))
+        .add(new Command("clean-tagged"))
         .add(new Command("clean"))
 		.defaultCommand("help");
 
@@ -52,6 +54,8 @@ void useData(string filename) {
             .on("tag", (args) => tag(args, data))
             .on("untag", (args) => untag(args, data))
             .on("export", (args) => exportThread(args, data))
+            .on("export-untagged", (args) => exportUntagged(data))
+            .on("clean-tagged", (args) => cleanTagged(data))
             .on("clean", (args) => cleanExports())
             .on("exit", (ProgramArgs args) {
                 shouldExit = true;
@@ -120,7 +124,20 @@ void exportThread(ProgramArgs args, MailingListDataSet data) {
         return;
     }
     auto thread = data.threads[threadIndex - 1];
-    string filename = format("thread-%d.txt", threadIndex);
+    exportThread(thread);
+}
+
+// Exports all threads in a data set which have no tags.
+void exportUntagged(MailingListDataSet data) {
+    foreach (thread; data.threads) {
+        if (thread.tags.empty) {
+            exportThread(thread);
+        }
+    }
+}
+
+void exportThread(EmailThread thread) {
+    string filename = format("thread-%d.txt", thread.searchIndex + 1);
     auto file = File(filename, "w");
     file.writefln(
         "Thread %d\nId: %d\nDate: %s\nSubject: %s\n\nTags: %s\n\n\n",
@@ -146,7 +163,17 @@ void exportThread(ProgramArgs args, MailingListDataSet data) {
         file.writefln("\n%s\n", email.body);
     }
     file.close();
-    writefln("Exported thread %d to %s.", threadIndex, filename);
+    writefln("Exported thread %d to %s.", thread.searchIndex + 1, filename);
+}
+
+void cleanTagged(MailingListDataSet data) {
+    foreach (thread; data.threads) {
+        string threadFile = format("thread-%d.txt", thread.searchIndex + 1);
+        if (!thread.tags.empty && threadFile.exists) {
+            threadFile.remove;
+            writefln("Removed %s.", threadFile);
+        }
+    }
 }
 
 // Removes all exported threads.
