@@ -63,6 +63,10 @@ Examples:
 
 Decisions that involve tools that developers use, such as online issue and project management boards, IDEs, or supplementary programs like package managers.
 
+Examples:
+
+> I really do not think it's worth looking at Reviewboard at reviews.apache.org again.  We have used it in the past, and it has all the downsides of gerrit and none of the upsides.  And some extra downsides of its own.
+
 ## Process
 
 Decisions about the overarching process developers must follow when implementing the software.
@@ -70,3 +74,6 @@ Decisions about the overarching process developers must follow when implementing
 Examples:
 
 > Reviewers should be able to suggest when experimental is warranted, and conversation on dev+jira to justify when it's transitioned from experimental to stable?
+
+> I propose that we take advantage of the dev list to perform that
+> separation.  Major new features and architectural improvements should be discussed first here, then when consensus on design is achieved, moved to Jira for implementation and review.

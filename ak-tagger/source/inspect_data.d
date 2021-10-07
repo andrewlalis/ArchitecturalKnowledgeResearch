@@ -20,8 +20,6 @@ void inspect(string filename) {
 	writefln("Read data and found %d threads.", data.threads.length);
     int[string] allTags;
     foreach (thread; data.threads) {
-        thread.tags.sort();
-        writefln("Thread %d: Tags: %s", thread.searchIndex + 1, thread.tags);
         foreach (tag; thread.tags) {
             if (tag !in allTags) {
                 allTags[tag] = 1;
@@ -31,4 +29,25 @@ void inspect(string filename) {
         }
     }
     writefln("All tags found: %s", allTags);
+
+    foreach (thread; data.threads) {
+        thread.getOverview;
+    }
+}
+
+void getOverview(EmailThread thread) {
+    thread.tags.sort();
+    writefln("## Thread %d is tagged with %s.", thread.searchIndex + 1, thread.tags);
+    int emailsToShow = min(5, thread.emails.length);
+    writefln("Showing the first %d emails of this thread.\n", emailsToShow);
+    for (int i = 0; i < emailsToShow; i++) {
+        auto email = thread.emails[i];
+        writefln(
+            "### Email %d of %d | Subject: %s\n```\n%s\n```",
+            email.threadIndex + 1,
+            emailsToShow,
+            email.subject,
+            email.body
+        );
+    }
 }

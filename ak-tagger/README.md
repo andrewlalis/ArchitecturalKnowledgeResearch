@@ -12,6 +12,10 @@ There are several major functionalities of the tagger program:
 ## Fetching
 To fetch data from ArchDetector for use with this tool, you can use the `fetch` subcommand. This will provide a simple interactive prompt where you can specify the search parameters, perform the search, and save the results.
 
+Note that fetching **requires a running instance of the ArcheDetector API on `localhost:8080`**.
+
+Also note that fetching is currently a work-in-progress, since work is being done to reduce its tight coupling with the specifics of the API.
+
 ## Interacting with Data
 To view and interact with the data from a particular data set, use the `use <file>` subcommand. This will provide a simple interactive prompt for navigating the data set, viewing individual or sequential data sources, and adding/removing tags from certain sources.
 
