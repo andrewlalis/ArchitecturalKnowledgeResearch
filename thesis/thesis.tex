@@ -1,6 +1,17 @@
 \documentclass{article}
 
+\usepackage{listings}
 \usepackage{multicol}
+\usepackage{graphicx}
+\usepackage[
+	colorlinks = true,
+	linkcolor = blue,
+	urlcolor = blue,
+	citecolor = blue,
+	anchorcolor = blue
+]{hyperref}
+\usepackage{parskip}
+
 
 \title{Finding Architectural Knowledge in Emails and Issues}
 \author{Andrew Lalis}
@@ -8,17 +19,43 @@
 \begin{document}
 
 \maketitle
+\section{Abstract}
+	This is the abstract!
+
+\newpage
+
+\tableofcontents
 
 \section{Introduction}
-	\begin{multicols}{2}
-		
-	\end{multicols}
+	This is a thesis about finding architectural knowledge in emails! Wow!
 
 \section{Categorization of Architectural Knowledge}
-	\begin{multicols*}{2}
-		According to Tom's research \cite{denBoon21} we know lots about architecture.
-	\end{multicols*}
+	According to Tom's research \cite{denBoon21} we know lots about architecture.
 
+\section{Preparing Data for Analysis}
+	While den Boon's ArchDetector web application provided a solid foundation for extracting normalized data from various Apache mailing lists (in the form of \textit{mbox} files) and Jira issues\cite{denBoon21}, it was not designed with the foresight to accommodate further developments, so a new, simple command-line application was developed to improve collaborative workflow of categorizing and exporting data.
+	
+	This application is called \textbf{ak-tagger}, and its source and usage documentation may be viewed online at \href{https://github.com/andrewlalis/ArchitecturalKnowledgeResearch}{this paper's associated GitHub repository}. A short description of its functionality will be supplied inline with this paper, but please refer to the online documentation for any further information or to report issues.
+	
+	\subsection{About the ak-tagger Program}
+		The architectural knowledge tagger program, colloquially known as \textbf{ak-tagger}, functions as a companion to the ArchDetector web application, that provides a more efficient interface for tagging and evaluating the categorization of sources of architectural knowledge, and sharing this information with others. The program is written in the \href{https://dlang.org/}{D programming language}, and can be compiled to a native executable with any D compiler (DMD, GDC, LDC) that provides the \textbf{dub} build tool.
+		
+		The ak-tagger program works with raw JSON data sets that are grouped into files based on the query that produced the set of results. Thus the program is designed primarily as a tool for analysis of prepared search queries and their results, as obtained from an instance of the ArchDetector REST API.
+		
+		\begin{figure}
+			\includegraphics[width=\textwidth]{./images/ak-tagger_system_diagram.png}
+			\caption{System diagram for the ak-tagger program's data usage.}
+		\end{figure}
+		
+		There program has several distinct functionalities:
+		\begin{enumerate}
+			\item \textbf{Fetch} - The user is able to fetch a raw dataset from the ArchDetector API and save it to a JSON file for sharing or their own use.
+			\item \textbf{Use} - Fetched datasets may be explored and categorized with a simple interactive command-line interface. Offers utilities such as exporting email threads as formatted text files for easy viewing, and modifying an email thread's set of tags.
+			\item \textbf{Inspect} - Datasets may be inspected to produce formatted aggregate information that's easier to use than the entire raw JSON file, including some aggregate information.
+		\end{enumerate}
+	
+		The general workflow for a user is to first \textit{fetch} a dataset from ArchDetector, then save it as a JSON file.
+		
 
 % The bibliography for this thesis.
 \bibliographystyle{plain}

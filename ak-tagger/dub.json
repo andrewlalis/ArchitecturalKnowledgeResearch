@@ -5,6 +5,7 @@
 	"copyright": "Copyright © 2021, Andrew Lalis",
 	"dependencies": {
 		"asdf": "~>0.7.12",
+		"collections-d": "~>0.4.5",
 		"commandr": "~>0.2.0"
 	},
 	"description": "Utility for categorizing sources of architectural knowledge.",

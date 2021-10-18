@@ -3,6 +3,7 @@
 	"versions": {
 		"asdf": "0.7.12",
 		"cachetools": "0.3.1",
+		"collections-d": "0.4.5",
 		"commandr": "0.2.0",
 		"mir-algorithm": "3.10.91",
 		"mir-core": "1.1.83",

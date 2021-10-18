@@ -7,6 +7,7 @@ import fetching;
 import ak_source_data;
 import use_data;
 import inspect_data;
+import merge_data;
 
 import asdf;
 import commandr;
@@ -18,7 +19,8 @@ void main(string[] args) {
 		.on("inspect", (ProgramArgs args) {
 			string filename = to!string(args.arg("file"));
 			inspect(filename);
-		});
+		})
+		.on("merge", (args) => merge(args));
 }
 
 void fetch(ProgramArgs args) {
@@ -38,6 +40,12 @@ void use(ProgramArgs args) {
 	useData(filename);
 }
 
+void merge(ProgramArgs args) {
+	auto inputFiles = args.args("files");
+	auto outputFile = args.arg("out");
+	mergeMailingListDataSets(inputFiles, outputFile);
+}
+
 private ProgramArgs parseArgs(string[] args) {
 	auto prog = new Program("ak-tagger")
 		.summary("Architectural knowledge categorization program.")
@@ -47,6 +55,9 @@ private ProgramArgs parseArgs(string[] args) {
 			.add(new Argument("file", "The file to use.")))
 		.add(new Command("inspect")
 			.add(new Argument("file", "The file to inspect.")))
+		.add(new Command("merge")
+			.add(new Argument("out"))
+			.add(new Argument("files").repeating.acceptsFiles))
 		.defaultCommand("help");
 
 	auto pArgs = prog.parse(args);

@@ -8,6 +8,7 @@ There are several major functionalities of the tagger program:
 - Fetching and parsing search results from the ArchDetector.
 - Categorizing fetched results with various tags.
 - Inspecting categorized results and doing analysis.
+- Merging multiple data sets to create larger aggregate sets.
 
 ## Fetching
 To fetch data from ArchDetector for use with this tool, you can use the `fetch` subcommand. This will provide a simple interactive prompt where you can specify the search parameters, perform the search, and save the results.
@@ -35,3 +36,11 @@ More specifically, the following commands are available from within the `use` in
 
 ## Inspecting the Data
 To gather aggregate information about a categorized data set, use the `inspect <file>` subcommand.
+
+## Merging Data Sets
+To merge multiple data sets, use the `merge <out file> <in file 1> <in file 2> ...` subcommand. All data from each input file will be merged together into a single output file, with duplicate email threads removed. If duplicate email threads from different data sets have different tags, the thread is tagged with the `CONFLICT` tag so that it can be reevaluated manually after merging is complete.
+
+For example, the command below will merge `first_set`, `second_set`, and `third_set` into `out.json`:
+```
+ak-tagger.exe merge out.json first_set.json second_set.json third_set.json
+```
