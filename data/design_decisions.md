@@ -2,19 +2,13 @@
 
 This document contains the basic definitions of each type of Architectural Design Decision, as they will be used to categorize emails and issues when filtering content.
 
-
-
 ## Architectural Knowledge
 
 A catch-all term under which any of the below definitions falls. If content is categorized as any type of design decision mentioned in this document, it is also implicitly a type of architectural knowledge.
 
 ## Structural
 
-Decisions that lead to the creation of subsystems, layers, partitions, and components in some view of the architecture.
-
-## Behavioral
-
-Decisions that are related to how the elements of a system interact to provide functionality or to satisfy some non-functional requirement (quality attribute), or connectors.
+Decisions that lead to the creation of subsystems, layers, partitions, and components in some view of the architecture, or decisions that are related to how the elements of a system interact to provide functionality or to satisfy some non-functional requirement (quality attribute), or connectors. *Note: Old "Behavioral" tag was merged with this one.*
 
 Examples:
 
@@ -77,3 +71,10 @@ Examples:
 
 > I propose that we take advantage of the dev list to perform that
 > separation.  Major new features and architectural improvements should be discussed first here, then when consensus on design is achieved, moved to Jira for implementation and review.
+
+
+
+## Additional Notes When Categorizing
+
+- Only consider the first few pieces of content.
+- 
