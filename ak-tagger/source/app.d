@@ -14,36 +14,13 @@ import commandr;
 
 void main(string[] args) {
 	parseArgs(args)
-		.on("fetch", (args) => fetch(args))
-		.on("use", (args) => use(args))
+		.on("fetch", (args) => fetch())
+		.on("use", (args) => useData(args.arg("file")))
 		.on("inspect", (ProgramArgs args) {
 			string filename = to!string(args.arg("file"));
 			inspect(filename);
 		})
-		.on("merge", (args) => merge(args));
-}
-
-void fetch(ProgramArgs args) {
-	writeln("Enter the Lucene search query to use:");
-	auto queryStr1 = readln();
-	// TODO: Implement input for mailing list ids, page, and size.
-	auto query = MailingListQuery(queryStr1, [10, 11, 12, 13], 0, 50);
-	auto result = searchMailingLists(query);
-	writefln("Found %d email threads matching this query.", result.threads.length);
-	writeln("Enter the name of the JSON file to save results to.");
-	auto filename = strip(readln());
-	std.file.write(filename, serializeToJsonPretty(result));
-}
-
-void use(ProgramArgs args) {
-	auto filename = args.arg("file");
-	useData(filename);
-}
-
-void merge(ProgramArgs args) {
-	auto inputFiles = args.args("files");
-	auto outputFile = args.arg("out");
-	mergeMailingListDataSets(inputFiles, outputFile);
+		.on("merge", (args) => mergeMailingListDataSets(args.args("files"), args.arg("out")));
 }
 
 private ProgramArgs parseArgs(string[] args) {

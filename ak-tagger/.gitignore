@@ -1,4 +1,5 @@
 .dub
+dub.settings.json
 docs.json
 __dummy.html
 docs/

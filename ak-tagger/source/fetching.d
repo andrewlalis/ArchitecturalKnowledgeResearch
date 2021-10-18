@@ -10,7 +10,7 @@ import std.range;
 import std.file;
 import std.datetime;
 import std.parallelism;
-import std.algorithm;
+import std.string;
 
 import asdf;
 
@@ -19,6 +19,25 @@ import ak_source_data;
 const string BASE_URL = "http://localhost:8080/api/v1";
 const string SEARCH_URL = BASE_URL ~ "/email-thread/search?q=%s&mailingListIds=%s&page=%d&size=%d";
 const string EMAILS_URL = BASE_URL ~ "/email-thread/%d/email?sort=date";
+
+void fetch() {
+	writeln("Enter the Lucene search query to use:");
+	auto queryStr = readln();
+    writeln("Enter the mailing list ids to use (comma-separted):");
+    auto mailingListIdsStr = readln();
+    uint[] mailingListIds = mailingListIdsStr.split(",").map!(a => to!uint(strip(a))).array;
+    writeln("How many results would you like to fetch?");
+    uint size = to!uint(strip(readln()));
+    writeln("What page of results would you like (starting from 0)?");
+    uint page = to!uint(strip(readln()));
+	auto query = MailingListQuery(queryStr, mailingListIds, page, size);
+    writefln("Will search using the following query: %s.\n\tExit the program (CTRL+C) to change parameters.", query);
+	auto result = searchMailingLists(query);
+	writefln("Found %d email threads matching this query.", result.threads.length);
+	writeln("Enter the name of the JSON file to save results to.");
+	string filename = strip(readln());
+	std.file.write(filename, serializeToJsonPretty(result));
+}
 
 /** 
  * Searches the ArchDetector mailing lists using the given query data, and

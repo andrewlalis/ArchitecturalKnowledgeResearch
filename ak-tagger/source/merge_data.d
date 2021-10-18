@@ -24,6 +24,7 @@ void mergeMailingListDataSets(string[] inputFiles, string outputFile) {
         allMailingListIds = allMailingListIds ~ dataSet.query.mailingListIds;
         
         foreach (emailThread; dataSet.threads) {
+            // Check if the thread already exists, then check if any duplicate has conflicting tags.
             bool isNew = true;
             foreach (ref existingThread; allEmails) {
                 if (existingThread.id == emailThread.id) {
