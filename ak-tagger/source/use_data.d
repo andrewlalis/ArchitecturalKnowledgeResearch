@@ -37,6 +37,8 @@ void useData(string filename) {
         .add(new Command("export")
             .add(new Argument("thread", "The thread number to export.")))
         .add(new Command("export-untagged"))
+        .add(new Command("export-tagged")
+            .add(new Argument("tag", "The tag to export threads from.")))
         .add(new Command("clean-tagged"))
         .add(new Command("clean"))
 		.defaultCommand("help");
@@ -55,6 +57,7 @@ void useData(string filename) {
             .on("untag", (args) => untag(args, data))
             .on("export", (args) => exportThread(args, data))
             .on("export-untagged", (args) => exportUntagged(data))
+            .on("export-tagged", (args) => exportTagged(args, data))
             .on("clean-tagged", (args) => cleanTagged(data))
             .on("clean", (args) => cleanExports())
             .on("exit", (ProgramArgs args) {
@@ -131,6 +134,16 @@ void exportThread(ProgramArgs args, MailingListDataSet data) {
 void exportUntagged(MailingListDataSet data) {
     foreach (thread; data.threads) {
         if (thread.tags.empty) {
+            exportThread(thread);
+        }
+    }
+}
+
+// Exports all threads which have a specified tag.
+void exportTagged(ProgramArgs args, MailingListDataSet data) {
+    string tag = args.arg("tag");
+    foreach (thread; data.threads) {
+        if (thread.tags.canFind(tag)) {
             exportThread(thread);
         }
     }

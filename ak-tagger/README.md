@@ -1,5 +1,5 @@
 # AK-Tagger
-The architectural knowledge tagger program is a companion to the ArchDetector web application, that provides a more efficient interface for tagging and evaluating the categorization of sources of architectural knowledge.
+The architectural knowledge tagger program is a companion to the ArchDetector web application, that provides a more efficient interface for tagging and evaluating the categorization of sources of architectural knowledge, in a way that's easy to share with others.
 
 ## Usage
 To compile and run this program, you will first need to have a [D compiler](https://dlang.org/download.html) installed on your system. Then, open a terminal in this directory (after cloning this repository), and run `dub build`. This should produce an `ak-tagger` executable, which you can run.
@@ -13,9 +13,14 @@ There are several major functionalities of the tagger program:
 ## Fetching
 To fetch data from ArchDetector for use with this tool, you can use the `fetch` subcommand. This will provide a simple interactive prompt where you can specify the search parameters, perform the search, and save the results.
 
-Note that fetching **requires a running instance of the ArcheDetector API on `localhost:8080`**.
+Note that fetching **requires a running instance of the ArchDetector API on `localhost:8080`**.
 
-Also note that fetching is currently a work-in-progress, since work is being done to reduce its tight coupling with the specifics of the API.
+When fetching, the following information will be required:
+
+1. The Lucene search query to provide to the API.
+2. The ids of all mailing lists to search through.
+3. The page size and number for results. Usually this is just page 0 in practice.
+4. Whether or not you want to filter the results. Filtering will remove email threads that are most likely auto-generated for things like continuous integration and testing reports.
 
 ## Interacting with Data
 To view and interact with the data from a particular data set, use the `use <file>` subcommand. This will provide a simple interactive prompt for navigating the data set, viewing individual or sequential data sources, and adding/removing tags from certain sources.
