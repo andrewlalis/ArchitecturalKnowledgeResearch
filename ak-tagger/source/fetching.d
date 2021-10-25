@@ -122,8 +122,10 @@ string toSimpleTimestamp(SysTime time) {
 
 MailingListDataSet filterResults(MailingListDataSet data) {
     EmailThread[] filteredThreads = [];
+    uint filteredThreadIndex = 0;
     foreach (thread; data.threads) {
         if (!shouldRemoveThread(thread)) {
+            thread.searchIndex = filteredThreadIndex++;
             filteredThreads ~= thread;
         }
     }

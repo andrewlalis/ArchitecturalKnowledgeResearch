@@ -28,8 +28,8 @@ To view and interact with the data from a particular data set, use the `use <fil
 More specifically, the following commands are available from within the `use` interactive interface:
 
 - `tags <thread>` List all tags for the given thread.
-- `tag <thread> <tag>` Add a tag to a thread.
-- `untag <thread> <tag>` Remove a tag from a thread.
+- `tag <thread> <tag>` Add a tag (or tags) to a thread.
+- `untag <thread> <tag>` Remove a tag (or tags) from a thread.
 - `export <thread>` Export a thread to a text file for easy viewing.
 - `export-untagged` Exports all threads which do not yet have any tags. Useful when you just want to tag lots of things.
 - `clean` Removes all exported text files.

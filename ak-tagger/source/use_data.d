@@ -30,10 +30,10 @@ void useData(string filename) {
             .add(new Argument("thread", "The thread to get the tags for.")))
 		.add(new Command("tag")
             .add(new Argument("thread", "The thread number to tag."))
-            .add(new Argument("value", "The tag to add to the thread.")))
+            .add(new Argument("value", "The tag to add to the thread.").repeating(true)))
         .add(new Command("untag")
             .add(new Argument("thread", "The thread number to tag."))
-            .add(new Argument("value", "The tag to remove from the thread.")))
+            .add(new Argument("value", "The tag to remove from the thread.").repeating(true)))
         .add(new Command("export")
             .add(new Argument("thread", "The thread number to export.")))
         .add(new Command("export-untagged"))
@@ -53,8 +53,8 @@ void useData(string filename) {
                 prog.printHelp();
             })
             .on("tags", (args) => listTags(args, data))
-            .on("tag", (args) => tag(args, data))
-            .on("untag", (args) => untag(args, data))
+            .on("tag", (args) => tag(args, data, filename))
+            .on("untag", (args) => untag(args, data, filename))
             .on("export", (args) => exportThread(args, data))
             .on("export-untagged", (args) => exportUntagged(data))
             .on("export-tagged", (args) => exportTagged(args, data))
@@ -84,39 +84,45 @@ void listTags(ProgramArgs args, MailingListDataSet data) {
 }
 
 // Adds a tag to a thread.
-void tag(ProgramArgs args, ref MailingListDataSet data) {
+void tag(ProgramArgs args, ref MailingListDataSet data, string filename) {
     uint threadIndex = to!uint(args.arg("thread"));
-    string tag = args.arg("value");
+    string[] tagsToAdd = args.args("value");
     if (threadIndex < 1 || threadIndex > data.threads.length) {
         writeln("Invalid thread.");
     } else {
         auto tags = data.threads[threadIndex - 1].tags;
-        if (!tags.canFind(tag)) {
-            tags ~= tag;
-            data.threads[threadIndex - 1].tags = tags;
-            writefln("Tagged thread %d with %s.", threadIndex, tag);
-        } else {
-            writefln("Thread %d already has the tag %s.", threadIndex, tag);
+        foreach (tagToAdd; tagsToAdd) {
+            if (!tags.canFind(tagToAdd)) {
+                tags ~= tagToAdd;
+                data.threads[threadIndex - 1].tags = tags;
+                writefln("Tagged thread %d with %s.", threadIndex, tagToAdd);
+            } else {
+                writefln("Thread %d already has the tag %s.", threadIndex, tagToAdd);
+            }
         }
     }
+    save(filename, data);
 }
 
 // Removes a tag from a thread.
-void untag(ProgramArgs args, ref MailingListDataSet data) {
+void untag(ProgramArgs args, ref MailingListDataSet data, string filename) {
     uint threadIndex = to!uint(args.arg("thread"));
-    string tag = args.arg("value");
+    string[] tagsToRemove = args.args("value");
     if (threadIndex < 1 || threadIndex > data.threads.length) {
         writeln("Invalid thread.");
     } else {
         auto tags = data.threads[threadIndex - 1].tags;
-        if (tags.canFind(tag)) {
-            tags = tags.remove!(a => a == tag);
-            data.threads[threadIndex - 1].tags = tags;
-            writefln("Removed tag %s from thread %d.", tag, threadIndex);
-        } else {
-            writefln("Thread %d isn't tagged with %s.", threadIndex, tag);
+        foreach (tagToRemove; tagsToRemove) {
+            if (tags.canFind(tagToRemove)) {
+                tags = tags.remove!(a => a == tagToRemove);
+                data.threads[threadIndex - 1].tags = tags;
+                writefln("Removed tag %s from thread %d.", tagToRemove, threadIndex);
+            } else {
+                writefln("Thread %d isn't tagged with %s.", threadIndex, tagToRemove);
+            }
         }
     }
+    save(filename, data);
 }
 
 // Exports a thread and all its contents to a text file for easy viewing.
@@ -154,7 +160,7 @@ void exportThread(EmailThread thread) {
     auto file = File(filename, "w");
     file.writefln(
         "Thread %d\nId: %d\nDate: %s\nSubject: %s\n\nTags: %s\n\n\n",
-        thread.searchIndex,
+        thread.searchIndex + 1,
         thread.id,
         SysTime.fromUnixTime(thread.date).toISOExtString,
         thread.subject,
@@ -202,5 +208,4 @@ void cleanExports() {
 
 void save(string filename, MailingListDataSet data) {
     std.file.write(filename, serializeToJsonPretty(data));
-    writefln("Saved data to %s.", filename);
 }

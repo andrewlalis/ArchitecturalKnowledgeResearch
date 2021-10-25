@@ -81,4 +81,5 @@ Examples:
 ## Additional Notes When Categorizing
 
 - Only consider the first few pieces of content.
-- 
+- When no architectural knowledge can be found in the first source item, or there is ambiguity, then continue the search.
+- Tag all non-architectural-knowledge sources as `not-ak`, and include an extra `spam` tag when the content of the source is clearly machine-generated.
