@@ -34,6 +34,13 @@ void fetch() {
     writefln("Will search using the following query: %s.\n\tExit the program (CTRL+C) to change parameters.", query);
 	auto result = searchMailingLists(query);
 	writefln("Found %d email threads matching this query.", result.threads.length);
+    writeln("Should the results be filtered to remove automated messages?");
+    string input = readln.strip.toLower();
+    auto shouldFilter = input == "yes" || input == "y";
+    if (shouldFilter) {
+        result = filterResults(result);
+        writefln("After filtering, %d email threads remain.", result.threads.length);
+    }
 	writeln("Enter the name of the JSON file to save results to.");
 	string filename = strip(readln());
 	std.file.write(filename, serializeToJsonPretty(result));
@@ -111,4 +118,23 @@ Email parseEmail(Asdf emailJson, uint threadIndex) {
 
 string toSimpleTimestamp(SysTime time) {
 	return format("%d-%d-%d_%02d-%02d-%02d", time.year, time.month, time.day, time.hour, time.minute, time.second);
+}
+
+MailingListDataSet filterResults(MailingListDataSet data) {
+    EmailThread[] filteredThreads = [];
+    foreach (thread; data.threads) {
+        if (!shouldRemoveThread(thread)) {
+            filteredThreads ~= thread;
+        }
+    }
+    data.threads = filteredThreads;
+    return data;
+}
+
+bool shouldRemoveThread(EmailThread thread) {
+    foreach (email; thread.emails) {
+        auto i = email.body.indexOf("builds.apache.org/job");
+        if (i != -1) return true;
+    }
+    return false;
 }

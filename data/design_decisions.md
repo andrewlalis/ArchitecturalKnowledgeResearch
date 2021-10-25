@@ -23,6 +23,8 @@ Examples:
 
 Decisions that establish an enduring trait or quality of the system. Property decisions can be design rules or guidelines (when expressed positively) or design constraints (when expressed negatively).
 
+- Specifically, these include an discussion which establishes some known property of the system.
+
 Examples:
 
 > As the first aspect of the discussion, we should probably state the overall goals and scoping for this effort:
@@ -48,6 +50,8 @@ Examples:
 ## Technology
 
 Decisions involving a choice of certain technologies for a system, such as programming languages, databases, messaging systems, or frameworks.
+
+- Most discussions about technology choices fall under this category, even if no final decision is made.
 
 Examples:
 
